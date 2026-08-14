@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Career Lains AI - Placement Preparation & Guidance{% endblock %}</title>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2pdf for resume PDF download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Custom Glassmorphism Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <div class="app-container">
+        {% if session.get('user_id') %}
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-logo">🚀</div>
+                <div>
+                    <div class="brand-title">Career Lains AI</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">Placement Prep Platform</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-pie"></i> Dashboard
+                </a>
+                <a href="{{ url_for('resume_builder') }}" class="nav-link {% if request.endpoint == 'resume_builder' %}active{% endif %}">
+                    <i class="fa-solid fa-file-invoice"></i> AI Resume Builder
+                </a>
+                <a href="{{ url_for('ats_checker') }}" class="nav-link {% if request.endpoint == 'ats_checker' %}active{% endif %}">
+                    <i class="fa-solid fa-bullseye"></i> ATS Resume Checker
+                </a>
+                <a href="{{ url_for('company_list') }}" class="nav-link {% if request.endpoint in ['company_list', 'company_detail'] %}active{% endif %}">
+                    <i class="fa-solid fa-building"></i> Company Dataset
+                </a>
+                <a href="{{ url_for('interview_prep') }}" class="nav-link {% if request.endpoint == 'interview_prep' %}active{% endif %}">
+                    <i class="fa-solid fa-user-tie"></i> AI Mock Interview
+                </a>
+                <a href="{{ url_for('chatbot') }}" class="nav-link {% if request.endpoint == 'chatbot' %}active{% endif %}">
+                    <i class="fa-solid fa-comments"></i> AI Career Chatbot
+                </a>
+            </nav>
+
+            <div class="sidebar-user">
+                <div class="user-avatar">
+                    {{ session.get('user_name', 'U')[0].upper() }}
+                </div>
+                <div class="user-info">
+                    <div class="user-name">{{ session.get('user_name', 'User') }}</div>
+                    <a href="{{ url_for('profile') }}" class="user-role" style="text-decoration: underline;">Edit Profile</a>
+                </div>
+                <a href="{{ url_for('logout') }}" title="Logout" style="color: var(--text-muted); font-size: 16px; margin-left: 8px;">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+        </aside>
+        {% endif %}
+
+        <!-- Main Content Area -->
+        <main class="main-content" {% if not session.get('user_id') %}style="margin-left: 0;"{% endif %}>
+            <!-- Flash Notification Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

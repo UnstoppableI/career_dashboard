@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Career Chatbot - Career Lains AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-comments" style="color: var(--accent-purple);"></i> AI Career Guidance Chatbot</h1>
+        <p class="page-subtitle">Your 24/7 placement mentor for career guidance, resume tips, and doubt resolution</p>
+    </div>
+</div>
+
+<div class="glass-card" style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; height: 680px; padding: 0; overflow: hidden;">
+    <!-- Chat Header -->
+    <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-glass); background: rgba(15, 23, 42, 0.9); display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 44px; height: 44px; background: var(--purple-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: var(--shadow-purple-glow);">
+                🤖
+            </div>
+            <div>
+                <div style="font-weight: 700; font-size: 16px;">CareerLanes AI Mentor</div>
+                <div style="font-size: 12px; color: var(--accent-emerald); display: flex; align-items: center; gap: 6px;">
+                    <span style="width: 8px; height: 8px; background: var(--accent-emerald); border-radius: 50%; display: inline-block;"></span> Online & Ready
+                </div>
+            </div>
+        </div>
+        <span class="badge badge-purple">Powered by Gemini AI</span>
+    </div>
+
+    <!-- Quick Question Chips -->
+    <div style="padding: 12px 20px; background: rgba(0, 0, 0, 0.2); border-bottom: 1px solid var(--border-glass); display: flex; gap: 10px; overflow-x: auto;">
+        <button class="quick-chip" data-prompt="How do I crack TCS NQT exam and get Digital role?">🏢 Crack TCS NQT</button>
+        <button class="quick-chip" data-prompt="What are top ATS resume keywords for a Software Engineer?">📄 ATS Resume Tips</button>
+        <button class="quick-chip" data-prompt="Explain Amazon leadership principles interview preparation.">📦 Amazon Leadership Principles</button>
+        <button class="quick-chip" data-prompt="How to negotiate salary package as a fresher?">💰 Salary Negotiation</button>
+    </div>
+
+    <!-- Chat Messages Scroll Container -->
+    <div id="chatMessagesBox" style="flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: rgba(0, 0, 0, 0.15);">
+        <!-- Default Welcome Bot Message -->
+        <div class="chat-msg bot-msg">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+                Hello {{ user.name }}! I am your <strong>CareerLanes AI Placement Assistant</strong>. 🎯<br><br>
+                Ask me anything about company recruitment processes (TCS, Google, Amazon, Infosys, etc.), resume ATS optimization, technical topics, or placement interview strategies!
+            </div>
+        </div>
+
+        {% for msg in history %}
+        <div class="chat-msg {% if msg.sender == 'user' %}user-msg{% else %}bot-msg{% endif %}">
+            <div class="msg-avatar">{% if msg.sender == 'user' %}👤{% else %}🤖{% endif %}</div>
+            <div class="msg-bubble">
+                {{ msg.message | replace('\n', '<br>') | safe }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Chat Input Area -->
+    <div style="padding: 16px 20px; background: rgba(15, 23, 42, 0.9); border-top: 1px solid var(--border-glass);">
+        <form id="chatForm" style="display: flex; gap: 12px;">
+            <input type="text" id="chatInput" class="form-control" placeholder="Type your career or placement question here..." autocomplete="off" style="border-radius: var(--radius-full); padding: 12px 20px;">
+            <button type="submit" id="chatSendBtn" class="btn btn-purple" style="border-radius: var(--radius-full); padding: 12px 24px;">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+.quick-chip {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition-fast);
+}
+.quick-chip:hover {
+    background: rgba(0, 242, 254, 0.1);
+    color: var(--primary-cyan);
+    border-color: var(--primary-cyan);
+}
+
+.chat-msg {
+    display: flex;
+    gap: 12px;
+    max-width: 80%;
+}
+.user-msg {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+.bot-msg {
+    align-self: flex-start;
+}
+
+.msg-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.msg-bubble {
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    line-height: 1.6;
+}
+.bot-msg .msg-bubble {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid var(--border-glass);
+    color: var(--text-primary);
+    border-top-left-radius: 4px;
+}
+.user-msg .msg-bubble {
+    background: var(--purple-gradient);
+    color: #ffffff;
+    border-top-right-radius: 4px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% endblock %}

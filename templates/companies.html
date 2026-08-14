@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Company Placement Dataset - Career Lains AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-building" style="color: var(--primary-cyan);"></i> Company Placement Dataset</h1>
+        <p class="page-subtitle">Company-oriented interview insights, eligibility criteria, past questions, and AI match roadmaps</p>
+    </div>
+</div>
+
+<!-- Search & Category Filters -->
+<div class="glass-card" style="margin-bottom: 32px; padding: 20px;">
+    <form action="{{ url_for('company_list') }}" method="GET" style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div style="flex: 2; min-width: 240px;">
+            <input type="text" name="q" class="form-control" placeholder="Search company name or required skill (e.g. TCS, Google, Python, AWS)..." value="{{ query }}">
+        </div>
+        <div style="flex: 1; min-width: 180px;">
+            <select name="category" class="form-control">
+                <option value="">All Company Types</option>
+                <option value="Product" {% if category == 'Product' %}selected{% endif %}>Product Giants (FAANG)</option>
+                <option value="Service" {% if category == 'Service' %}selected{% endif %}>Service Based IT</option>
+                <option value="Consulting" {% if category == 'Consulting' %}selected{% endif %}>Consulting & Advisory</option>
+                <option value="Tech" {% if category == 'Tech' %}selected{% endif %}>Tech & Cloud Giants</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="padding: 12px 24px;">
+            <i class="fa-solid fa-magnifying-glass"></i> Search Companies
+        </button>
+    </form>
+</div>
+
+<!-- Companies Grid -->
+<div class="grid-3">
+    {% for comp in companies %}
+    <div class="glass-card glass-card-interactive" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <span style="font-size: 36px;">{{ comp.logo_symbol }}</span>
+                <span class="badge badge-purple">{{ comp.category }}</span>
+            </div>
+            <h3 style="font-size: 20px; margin-bottom: 4px;">{{ comp.name }}</h3>
+            <p style="font-size: 13px; color: var(--primary-cyan); font-weight: 500; margin-bottom: 12px;">{{ comp.tagline }}</p>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
+                {{ comp.description }}
+            </p>
+
+            <div style="margin-bottom: 16px;">
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 6px;">REQUIRED SKILLS:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    {% for skill in comp.required_skills | from_json %}
+                        <span class="badge badge-cyan" style="text-transform: none;">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-glass); padding-top: 16px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-size: 11px; color: var(--text-muted);">PACKAGE RANGE</div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--accent-emerald);">💰 {{ comp.salary_details.split('|')[0] }}</div>
+            </div>
+            <a href="{{ url_for('company_detail', slug=comp.slug) }}" class="btn btn-outline-cyan" style="padding: 6px 14px; font-size: 13px;">
+                Placement Guide &rarr;
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div style="grid-column: 1 / -1;" class="glass-card">
+        <p style="text-align: center; color: var(--text-muted);">No companies found matching your search query.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

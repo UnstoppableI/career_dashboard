@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Interview Assistant - Career Lains AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-user-tie" style="color: var(--primary-cyan);"></i> AI Mock Interview Assistant</h1>
+        <p class="page-subtitle">Practice company-specific Technical & HR interview questions with real-time AI scoring and STAR feedback</p>
+    </div>
+</div>
+
+<div class="grid-2" style="grid-template-columns: 1fr 1fr; gap: 28px; align-items: start;">
+    <!-- Left Column: Configure Session & Practice Room -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div class="glass-card">
+            <h3 style="font-size: 20px; margin-bottom: 16px;"><i class="fa-solid fa-sliders" style="color: var(--primary-cyan);"></i> Configure Interview Session</h3>
+            
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label">Target Company</label>
+                    <select id="intCompany" class="form-control">
+                        {% for comp in companies %}
+                            <option value="{{ comp.name }}" {% if comp.slug == 'tcs' %}selected{% endif %}>{{ comp.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Round Category</label>
+                    <select id="intCategory" class="form-control">
+                        <option value="Technical">Technical Interview Round</option>
+                        <option value="HR">HR & Behavioral Round</option>
+                        <option value="Managerial">Managerial & Situational Round</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Target Job Role</label>
+                <input type="text" id="intRole" class="form-control" value="{{ user.target_role }}">
+            </div>
+
+            <button id="intGenerateBtn" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Interview Questions
+            </button>
+        </div>
+
+        <!-- Practice Room Box -->
+        <div id="intPracticeCard" class="glass-card" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <span class="badge badge-purple" id="intCategoryBadge">Technical Round</span>
+                <span style="font-size: 12px; color: var(--text-muted);" id="intQuestionIndex">Question 1 of 3</span>
+            </div>
+
+            <h3 id="intQuestionText" style="font-size: 18px; color: var(--text-primary); margin-bottom: 20px; line-height: 1.5;">
+                <!-- AI Generated Question -->
+            </h3>
+
+            <div class="form-group">
+                <label class="form-label">Type Your Response (Use STAR method: Situation, Task, Action, Result)</label>
+                <textarea id="intAnswerText" class="form-control" placeholder="In my recent project, I encountered..." style="min-height: 160px;"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; gap: 12px;">
+                <button id="intNextQBtn" class="btn btn-secondary" style="padding: 10px 16px; font-size: 13px;">
+                    Skip Question &rarr;
+                </button>
+                <button id="intSubmitAnswerBtn" class="btn btn-purple" style="padding: 10px 24px;">
+                    <i class="fa-solid fa-paper-plane"></i> Submit & Evaluate Answer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Live AI Answer Evaluation & Feedback -->
+    <div>
+        <div id="intEvalPlaceholder" class="glass-card" style="text-align: center; padding: 60px 20px;">
+            <div style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"><i class="fa-solid fa-comments"></i></div>
+            <h3 style="font-size: 20px; color: var(--text-secondary);">Interview Feedback Hub</h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-top: 8px; max-width: 320px; margin-left: auto; margin-right: auto;">
+                Select a company and category on the left to start your AI mock interview and receive real-time feedback.
+            </p>
+        </div>
+
+        <div id="intEvalCard" class="glass-card" style="display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-glass); padding-bottom: 16px; margin-bottom: 20px;">
+                <div>
+                    <span class="badge badge-emerald">Evaluation Complete</span>
+                    <h3 style="font-size: 20px; margin-top: 4px;">Performance Score</h3>
+                </div>
+                <div class="score-circle" id="intScoreCircle" style="--score: 85; width: 90px; height: 90px;">
+                    <div class="score-value" id="intScoreVal" style="font-size: 24px;">85</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="gap: 16px; margin-bottom: 20px;">
+                <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-glass);">
+                    <div style="font-size: 12px; color: var(--text-muted);">CLARITY & STRUCTURE</div>
+                    <div style="font-size: 15px; font-weight: 700; color: var(--primary-cyan);" id="intClarityVal">Good</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-glass);">
+                    <div style="font-size: 12px; color: var(--text-muted);">TECHNICAL ACCURACY</div>
+                    <div style="font-size: 15px; font-weight: 700; color: var(--accent-emerald);" id="intAccuracyVal">High</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h4 style="font-size: 14px; color: var(--accent-amber); margin-bottom: 8px;"><i class="fa-solid fa-wrench"></i> Key Improvement Suggestions</h4>
+                <ul id="intFeedbackList" style="padding-left: 18px; font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 6px;"></ul>
+            </div>
+
+            <div>
+                <h4 style="font-size: 14px; color: var(--primary-cyan); margin-bottom: 8px;"><i class="fa-solid fa-award"></i> Model Exemplar Answer (STAR Method)</h4>
+                <div id="intModelAnswer" style="background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.2); padding: 14px; border-radius: var(--radius-md); font-size: 13px; color: var(--text-primary); line-height: 1.6;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/interview.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ company.name }} - Placement Guide & AI Skill Gap Roadmap{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="font-size: 48px;">{{ company.logo_symbol }}</span>
+        <div>
+            <h1 class="page-title">{{ company.name }}</h1>
+            <p class="page-subtitle">{{ company.category }} | Min Eligibility: CGPA {{ company.min_cgpa }} / 10</p>
+        </div>
+    </div>
+    <a href="{{ url_for('company_list') }}" class="btn btn-secondary">
+        &larr; Back to Companies
+    </a>
+</div>
+
+<!-- Header Match Banner & Overview -->
+<div class="grid-3" style="grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px;">
+    <!-- Company Info & Process -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div class="glass-card">
+            <h3 style="font-size: 20px; margin-bottom: 12px;"><i class="fa-solid fa-circle-info" style="color: var(--primary-cyan);"></i> Company Overview</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+                {{ company.description }}
+            </p>
+
+            <div class="grid-2">
+                <div style="background: rgba(0, 0, 0, 0.2); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-glass);">
+                    <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">ELIGIBILITY CRITERIA</div>
+                    <div style="font-size: 13px; color: var(--text-primary); margin-top: 4px;">{{ company.eligibility }}</div>
+                </div>
+                <div style="background: rgba(0, 0, 0, 0.2); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-glass);">
+                    <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">SALARY PACKAGE DETAILS</div>
+                    <div style="font-size: 13px; color: var(--accent-emerald); font-weight: 700; margin-top: 4px;">{{ company.salary_details }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selection & Interview Process -->
+        <div class="glass-card">
+            <h3 style="font-size: 20px; margin-bottom: 16px;"><i class="fa-solid fa-list-check" style="color: var(--primary-cyan);"></i> Selection & Interview Process</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                {% for round in interview_process %}
+                <div style="display: flex; gap: 14px; align-items: flex-start; background: rgba(255, 255, 255, 0.02); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--border-glass);">
+                    <div style="width: 32px; height: 32px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #000; flex-shrink: 0;">
+                        {{ loop.index }}
+                    </div>
+                    <div style="font-size: 14px; color: var(--text-secondary); align-self: center;">
+                        {{ round }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Previous Interview Questions -->
+        <div class="glass-card">
+            <h3 style="font-size: 20px; margin-bottom: 16px;"><i class="fa-solid fa-file-circle-question" style="color: var(--accent-purple);"></i> Past Technical & HR Interview Questions</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                {% for question in previous_questions %}
+                <div style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-glass); padding: 14px; border-radius: var(--radius-md); font-size: 14px; color: var(--text-primary);">
+                    <i class="fa-solid fa-circle-dot" style="color: var(--primary-cyan); margin-right: 8px;"></i> {{ question }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Skill Gap Matcher & Learning Roadmap Card -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div class="glass-card" style="border-color: var(--border-glass-hover);">
+            <h3 style="font-size: 18px; margin-bottom: 16px; text-align: center;"><i class="fa-solid fa-bullseye" style="color: var(--primary-cyan);"></i> Your Match Score</h3>
+            
+            <div class="score-circle" style="--score: {{ match_result.match_percentage }}; margin-bottom: 16px;">
+                <div class="score-value">{{ match_result.match_percentage }}%</div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="font-size: 14px; font-weight: 600; color: var(--text-primary);">
+                    {% if match_result.match_percentage >= 80 %}
+                        🔥 Excellent Profile Alignment!
+                    {% elif match_result.match_percentage >= 60 %}
+                        ⚡ Moderate Fit - Minor Skill Gaps
+                    {% else %}
+                        🎯 Skill Enhancement Required
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <div style="font-size: 12px; color: var(--accent-emerald); font-weight: 600; margin-bottom: 6px;">MATCHED SKILLS:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    {% for m_skill in match_result.matched_skills %}
+                        <span class="badge badge-emerald" style="text-transform: none;">✓ {{ m_skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div>
+                <div style="font-size: 12px; color: #f87171; font-weight: 600; margin-bottom: 6px;">MISSING SKILLS:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    {% for miss in match_result.missing_skills %}
+                        <span class="badge badge-amber" style="text-transform: none;">+ {{ miss }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 4-Week AI Roadmap Card -->
+        <div class="glass-card">
+            <h3 style="font-size: 18px; margin-bottom: 16px;"><i class="fa-solid fa-route" style="color: var(--accent-purple);"></i> 4-Week Placement Roadmap</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                {% for step in match_result.roadmap %}
+                <div style="border-left: 3px solid var(--primary-cyan); padding-left: 14px;">
+                    <div style="font-size: 12px; color: var(--primary-cyan); font-weight: 700;">WEEK {{ step.week }}: {{ step.topic }}</div>
+                    <div style="font-size: 13px; font-weight: 600; margin-top: 2px;">{{ step.objective }}</div>
+                    <ul style="padding-left: 16px; font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+                        {% for t in step.tasks %}
+                            <li>{{ t }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div style="font-size: 11px; color: var(--accent-emerald); margin-top: 4px;">📖 Resource: {{ step.resource }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

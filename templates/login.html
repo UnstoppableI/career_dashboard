@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Career Lains AI{% endblock %}
+
+{% block content %}
+<div style="max-width: 440px; margin: 60px auto; width: 100%;">
+    <div class="glass-card" style="padding: 40px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 60px; height: 60px; background: var(--primary-gradient); border-radius: var(--radius-md); display: inline-flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 16px; box-shadow: var(--shadow-glow);">
+                🚀
+            </div>
+            <h2 style="font-size: 28px; font-weight: 800; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Career Lains AI</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 6px;">AI-Powered Career Guidance & Placement Platform</p>
+        </div>
+
+        <form action="{{ url_for('login') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                <input type="email" name="email" class="form-control" placeholder="student@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 14px;">
+                <i class="fa-solid fa-right-to-bracket"></i> Log In to Dashboard
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-glass); color: var(--text-muted); font-size: 14px;">
+            Don't have an account? <a href="{{ url_for('signup') }}" style="font-weight: 600;">Sign Up Free</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

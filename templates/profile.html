@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}User Profile - Career Lains AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">User Profile & Preferences</h1>
+        <p class="page-subtitle">Update your career goals and target roles for personalized AI recommendations</p>
+    </div>
+</div>
+
+<div style="max-width: 680px;">
+    <div class="glass-card">
+        <form action="{{ url_for('profile') }}" method="POST">
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-user"></i> Full Name</label>
+                <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-envelope"></i> Email Address (Read-only)</label>
+                <input type="email" class="form-control" value="{{ user.email }}" disabled style="opacity: 0.6;">
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label class="form-label"><i class="fa-solid fa-crosshairs"></i> Target Placement Role</label>
+                    <select name="target_role" class="form-control">
+                        <option value="Software Engineer" {% if user.target_role == 'Software Engineer' %}selected{% endif %}>Software Engineer</option>
+                        <option value="Frontend Developer" {% if user.target_role == 'Frontend Developer' %}selected{% endif %}>Frontend Developer</option>
+                        <option value="Backend Developer" {% if user.target_role == 'Backend Developer' %}selected{% endif %}>Backend Developer</option>
+                        <option value="Data Analyst" {% if user.target_role == 'Data Analyst' %}selected{% endif %}>Data Analyst</option>
+                        <option value="Cloud Engineer" {% if user.target_role == 'Cloud Engineer' %}selected{% endif %}>Cloud Engineer</option>
+                        <option value="Full Stack Developer" {% if user.target_role == 'Full Stack Developer' %}selected{% endif %}>Full Stack Developer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"><i class="fa-solid fa-graduation-cap"></i> Experience / Academic Level</label>
+                    <select name="experience_level" class="form-control">
+                        <option value="Fresher / Student" {% if user.experience_level == 'Fresher / Student' %}selected{% endif %}>Fresher / Student</option>
+                        <option value="0-1 Year Experience" {% if user.experience_level == '0-1 Year Experience' %}selected{% endif %}>0-1 Year Experience</option>
+                        <option value="1-3 Years Experience" {% if user.experience_level == '1-3 Years Experience' %}selected{% endif %}>1-3 Years Experience</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-id-card"></i> Short Bio / Career Summary</label>
+                <textarea name="bio" class="form-control" placeholder="Briefly describe your technical background and placement goals...">{{ user.bio or '' }}</textarea>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Profile Changes
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

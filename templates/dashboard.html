@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Career Lains AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Welcome back, {{ user.name }}! 👋</h1>
+        <p class="page-subtitle">Target Role: <strong style="color: var(--primary-cyan);">{{ user.target_role }}</strong> | Status: {{ user.experience_level }}</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        <a href="{{ url_for('resume_builder') }}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Build Resume
+        </a>
+        <a href="{{ url_for('ats_checker') }}" class="btn btn-purple">
+            <i class="fa-solid fa-bullseye"></i> Test ATS Score
+        </a>
+    </div>
+</div>
+
+<!-- Metrics Cards Grid -->
+<div class="grid-4" style="margin-bottom: 32px;">
+    <!-- ATS Score Metric Card -->
+    <div class="glass-card" style="display: flex; align-items: center; gap: 16px;">
+        <div class="score-circle" style="--score: {{ recent_ats or 65 }}; width: 80px; height: 80px;">
+            <div class="score-value" style="font-size: 22px;">{{ recent_ats or '--' }}</div>
+        </div>
+        <div>
+            <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;">LATEST ATS SCORE</div>
+            <div style="font-size: 18px; font-weight: 700; margin-top: 2px;">
+                {% if recent_ats >= 85 %}
+                    <span style="color: var(--accent-emerald);">Excellent (Top 5%)</span>
+                {% elif recent_ats >= 70 %}
+                    <span style="color: var(--primary-cyan);">Good Alignment</span>
+                {% elif recent_ats > 0 %}
+                    <span style="color: var(--accent-amber);">Needs Work</span>
+                {% else %}
+                    <span style="color: var(--text-muted);">No Scans Yet</span>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('ats_checker') }}" style="font-size: 12px; margin-top: 4px; display: inline-block;">Scan Resume &rarr;</a>
+        </div>
+    </div>
+
+    <!-- Active Resume Card -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="width: 44px; height: 44px; background: rgba(0, 242, 254, 0.12); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--primary-cyan); font-size: 20px;">
+                <i class="fa-solid fa-file-invoice"></i>
+            </div>
+            <span class="badge badge-cyan">Active</span>
+        </div>
+        <div style="margin-top: 14px;">
+            <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;">PRIMARY RESUME</div>
+            <div style="font-size: 18px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ resume.title if resume else 'No Resume Created' }}</div>
+        </div>
+        <a href="{{ url_for('resume_builder') }}" style="font-size: 12px; margin-top: 8px; display: inline-block;">Edit in Builder &rarr;</a>
+    </div>
+
+    <!-- Mock Interview Practice Card -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="width: 44px; height: 44px; background: rgba(127, 0, 255, 0.12); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: #c084fc; font-size: 20px;">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <span class="badge badge-purple">AI Powered</span>
+        </div>
+        <div style="margin-top: 14px;">
+            <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;">MOCK SESSIONS</div>
+            <div style="font-size: 24px; font-weight: 800; font-family: var(--font-heading);">{{ interview_count }} <span style="font-size: 13px; color: var(--text-secondary); font-weight: 400;">Completed</span></div>
+        </div>
+        <a href="{{ url_for('interview_prep') }}" style="font-size: 12px; margin-top: 4px; display: inline-block;">Start New Session &rarr;</a>
+    </div>
+
+    <!-- Target Companies Card -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="width: 44px; height: 44px; background: rgba(0, 230, 118, 0.12); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--accent-emerald); font-size: 20px;">
+                <i class="fa-solid fa-building"></i>
+            </div>
+            <span class="badge badge-emerald">Dataset</span>
+        </div>
+        <div style="margin-top: 14px;">
+            <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;">AVAILABLE DATASETS</div>
+            <div style="font-size: 24px; font-weight: 800; font-family: var(--font-heading);">11+ <span style="font-size: 13px; color: var(--text-secondary); font-weight: 400;">Top IT Giants</span></div>
+        </div>
+        <a href="{{ url_for('company_list') }}" style="font-size: 12px; margin-top: 4px; display: inline-block;">Explore Companies &rarr;</a>
+    </div>
+</div>
+
+<!-- Main Sections Grid -->
+<div class="grid-3" style="grid-template-columns: 2fr 1fr; margin-bottom: 32px;">
+    <!-- Featured Top Companies Section -->
+    <div class="glass-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 20px;"><i class="fa-solid fa-layer-group" style="color: var(--primary-cyan);"></i> Top Recruiting Companies</h3>
+            <a href="{{ url_for('company_list') }}" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">View All</a>
+        </div>
+
+        <div class="grid-2">
+            {% for company in companies %}
+            <div class="glass-card glass-card-interactive" style="padding: 18px; background: rgba(255, 255, 255, 0.02);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                    <span style="font-size: 28px;">{{ company.logo_symbol }}</span>
+                    <div>
+                        <div style="font-weight: 700; font-size: 16px;">{{ company.name }}</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">{{ company.category }}</div>
+                    </div>
+                </div>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-clamp: 2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ company.tagline }}
+                </p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 12px; color: var(--accent-emerald); font-weight: 600;">💰 {{ company.salary_details.split('|')[0] }}</span>
+                    <a href="{{ url_for('company_detail', slug=company.slug) }}" class="btn btn-outline-cyan" style="padding: 4px 12px; font-size: 12px;">
+                        Details & Roadmap &rarr;
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Quick AI Assistant Launcher Card -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="glass-card" style="background: linear-gradient(135deg, rgba(127, 0, 255, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%); border-color: rgba(127, 0, 255, 0.3);">
+            <div style="font-size: 32px; margin-bottom: 12px;">🤖</div>
+            <h3 style="font-size: 20px; margin-bottom: 6px;">AI Placement Assistant</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
+                Have questions about salary negotiation, resume tips, or company selection? Ask CareerLanes AI Bot.
+            </p>
+            <a href="{{ url_for('chatbot') }}" class="btn btn-purple" style="width: 100%;">
+                <i class="fa-solid fa-comments"></i> Start AI Career Chat
+            </a>
+        </div>
+
+        <div class="glass-card">
+            <h4 style="font-size: 16px; margin-bottom: 14px;"><i class="fa-solid fa-lightbulb" style="color: var(--accent-amber);"></i> Placement Prep Tip</h4>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+                "85% of tech resumes are filtered out by ATS scanners before reaching HR. Always tailor your resume bullet points to include exact keywords like <strong>Data Structures, SQL, and OOPs</strong>."
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Recent ATS Reports Table -->
+{% if ats_logs %}
+<div class="glass-card">
+    <h3 style="font-size: 20px; margin-bottom: 16px;"><i class="fa-solid fa-clock-rotate-left" style="color: var(--primary-cyan);"></i> Recent ATS Evaluation History</h3>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-glass); color: var(--text-muted); font-size: 13px;">
+                    <th style="padding: 12px;">File Name / Source</th>
+                    <th style="padding: 12px;">Job Role Target</th>
+                    <th style="padding: 12px;">ATS Score</th>
+                    <th style="padding: 12px;">Date</th>
+                    <th style="padding: 12px; text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in ats_logs %}
+                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04);">
+                    <td style="padding: 14px; font-weight: 600;"><i class="fa-solid fa-file-pdf" style="color: var(--primary-cyan); margin-right: 8px;"></i> {{ log.file_name }}</td>
+                    <td style="padding: 14px; color: var(--text-secondary);">{{ log.job_role }}</td>
+                    <td style="padding: 14px;">
+                        <span class="badge {% if log.ats_score >= 80 %}badge-emerald{% elif log.ats_score >= 65 %}badge-cyan{% else %}badge-amber{% endif %}">
+                            {{ log.ats_score }} / 100
+                        </span>
+                    </td>
+                    <td style="padding: 14px; color: var(--text-muted); font-size: 13px;">{{ log.created_at }}</td>
+                    <td style="padding: 14px; text-align: right;">
+                        <a href="{{ url_for('ats_checker') }}" class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;">View Report</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

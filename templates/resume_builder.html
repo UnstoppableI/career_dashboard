@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Resume Builder - Career Lains AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="fa-solid fa-file-invoice" style="color: var(--primary-cyan);"></i> AI Resume Builder</h1>
+        <p class="page-subtitle">Build ATS-friendly, professional resumes with real-time live preview & AI enhancement</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+        <button id="saveResumeBtn" class="btn btn-secondary">
+            <i class="fa-solid fa-floppy-disk"></i> Save Draft
+        </button>
+        <button id="downloadPdfBtn" class="btn btn-primary">
+            <i class="fa-solid fa-file-pdf"></i> Download PDF
+        </button>
+    </div>
+</div>
+
+<div class="grid-2" style="grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+    <!-- Left Column: Interactive Form Builder -->
+    <div class="glass-card">
+        <!-- Section Tabs -->
+        <div style="display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 1px solid var(--border-glass); padding-bottom: 12px; overflow-x: auto;">
+            <button class="tab-btn active" data-target="tab-personal">Personal</button>
+            <button class="tab-btn" data-target="tab-summary">Summary</button>
+            <button class="tab-btn" data-target="tab-experience">Experience</button>
+            <button class="tab-btn" data-target="tab-projects">Projects</button>
+            <button class="tab-btn" data-target="tab-education">Education</button>
+            <button class="tab-btn" data-target="tab-skills">Skills</button>
+            <button class="tab-btn" data-target="tab-theme">Theme</button>
+        </div>
+
+        <form id="resumeForm">
+            <input type="hidden" id="resumeId" value="{{ resume.id if resume else '' }}">
+
+            <!-- Tab 1: Personal Info -->
+            <div id="tab-personal" class="tab-content active">
+                <h3 style="font-size: 18px; margin-bottom: 16px;">Personal Information</h3>
+                <div class="form-group">
+                    <label class="form-label">Resume Title</label>
+                    <input type="text" id="resTitle" class="form-control" value="{{ resume.title if resume else 'My Resume' }}">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="resName" class="form-control" placeholder="Rahul Sharma">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="resEmail" class="form-control" placeholder="rahul@example.com">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" id="resPhone" class="form-control" placeholder="+91 9876543210">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location / City</label>
+                        <input type="text" id="resLocation" class="form-control" placeholder="Bengaluru, India">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">LinkedIn Profile URL</label>
+                        <input type="text" id="resLinkedin" class="form-control" placeholder="linkedin.com/in/rahul">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">GitHub / Portfolio URL</label>
+                        <input type="text" id="resGithub" class="form-control" placeholder="github.com/rahul">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Executive Summary -->
+            <div id="tab-summary" class="tab-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="font-size: 18px;">Professional Summary</h3>
+                    <button type="button" id="aiEnhanceSummaryBtn" class="btn btn-purple" style="padding: 4px 12px; font-size: 12px;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI Enhance
+                    </button>
+                </div>
+                <div class="form-group">
+                    <textarea id="resSummary" class="form-control" placeholder="Passionate Software Developer with strong foundations in Java, Data Structures, and Web Development..." style="min-height: 140px;"></textarea>
+                </div>
+            </div>
+
+            <!-- Tab 3: Work Experience -->
+            <div id="tab-experience" class="tab-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="font-size: 18px;">Work Experience / Internships</h3>
+                    <button type="button" id="addExpBtn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;">
+                        <i class="fa-solid fa-plus"></i> Add Position
+                    </button>
+                </div>
+                <div id="experienceContainer">
+                    <!-- Dynamic Experience Items -->
+                </div>
+            </div>
+
+            <!-- Tab 4: Projects -->
+            <div id="tab-projects" class="tab-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="font-size: 18px;">Projects</h3>
+                    <button type="button" id="addProjBtn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;">
+                        <i class="fa-solid fa-plus"></i> Add Project
+                    </button>
+                </div>
+                <div id="projectsContainer">
+                    <!-- Dynamic Project Items -->
+                </div>
+            </div>
+
+            <!-- Tab 5: Education -->
+            <div id="tab-education" class="tab-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="font-size: 18px;">Education</h3>
+                    <button type="button" id="addEduBtn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;">
+                        <i class="fa-solid fa-plus"></i> Add Education
+                    </button>
+                </div>
+                <div id="educationContainer">
+                    <!-- Dynamic Education Items -->
+                </div>
+            </div>
+
+            <!-- Tab 6: Skills -->
+            <div id="tab-skills" class="tab-content" style="display: none;">
+                <h3 style="font-size: 18px; margin-bottom: 16px;">Technical Skills & Certifications</h3>
+                <div class="form-group">
+                    <label class="form-label">Programming Languages (Comma-separated)</label>
+                    <input type="text" id="resSkillsLanguages" class="form-control" placeholder="Python, Java, C++, JavaScript, SQL">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Frameworks & Developer Tools</label>
+                    <input type="text" id="resSkillsTools" class="form-control" placeholder="Flask, React, Node.js, Git, AWS, Docker">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Certifications / Achievements</label>
+                    <textarea id="resCertifications" class="form-control" placeholder="• AWS Certified Cloud Practitioner&#10;• HackerRank 5-Star Java Badge"></textarea>
+                </div>
+            </div>
+
+            <!-- Tab 7: Theme & Styling -->
+            <div id="tab-theme" class="tab-content" style="display: none;">
+                <h3 style="font-size: 18px; margin-bottom: 16px;">Choose Resume Theme</h3>
+                <div class="grid-3" style="grid-template-columns: repeat(3, 1fr);">
+                    <label class="theme-card active" data-theme="modern" style="cursor: pointer; border: 2px solid var(--primary-cyan); padding: 14px; border-radius: var(--radius-md); text-align: center; background: rgba(0, 0, 0, 0.3);">
+                        <div style="font-weight: 700; margin-bottom: 4px;">Modern Glass</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Sleek Accent Bar</div>
+                    </label>
+                    <label class="theme-card" data-theme="corporate" style="cursor: pointer; border: 1px solid var(--border-glass); padding: 14px; border-radius: var(--radius-md); text-align: center; background: rgba(0, 0, 0, 0.3);">
+                        <div style="font-weight: 700; margin-bottom: 4px;">Corporate Dark</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Classic Professional</div>
+                    </label>
+                    <label class="theme-card" data-theme="minimal" style="cursor: pointer; border: 1px solid var(--border-glass); padding: 14px; border-radius: var(--radius-md); text-align: center; background: rgba(0, 0, 0, 0.3);">
+                        <div style="font-weight: 700; margin-bottom: 4px;">Minimalist</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">Clean White Print</div>
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Right Column: Real-time Live Document Preview -->
+    <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 14px; color: var(--text-secondary); font-weight: 600;">
+                <i class="fa-solid fa-eye"></i> Live ATS Document Preview
+            </span>
+            <span class="badge badge-cyan" id="previewThemeBadge">Theme: Modern Glass</span>
+        </div>
+
+        <div id="resumePreviewContainer" style="background: #ffffff; color: #111111; padding: 40px; border-radius: var(--radius-md); min-height: 750px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); font-family: 'Inter', sans-serif; font-size: 13px; line-height: 1.5;">
+            <!-- Rendered Live Resume Document -->
+            <div id="pvHeader" style="border-bottom: 2px solid #00f2fe; padding-bottom: 16px; margin-bottom: 20px;">
+                <h1 id="pvName" style="font-size: 26px; font-weight: 800; color: #0f172a; margin-bottom: 4px;">Rahul Sharma</h1>
+                <div id="pvContact" style="font-size: 12px; color: #475569; display: flex; flex-wrap: wrap; gap: 12px;">
+                    <span><i class="fa-solid fa-envelope"></i> rahul@example.com</span>
+                    <span><i class="fa-solid fa-phone"></i> +91 9876543210</span>
+                    <span><i class="fa-solid fa-location-dot"></i> Bengaluru, India</span>
+                    <span><i class="fa-brands fa-linkedin"></i> linkedin.com/in/rahul</span>
+                </div>
+            </div>
+
+            <div id="pvSummarySection" style="margin-bottom: 20px;">
+                <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; color: #0284c7; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 8px;">Executive Summary</h2>
+                <p id="pvSummary" style="color: #334155;">Passionate Software Developer with strong foundations in Java, Data Structures, SQL, and Web Development. Adept at building scalable web applications and solving complex algorithmic challenges.</p>
+            </div>
+
+            <div id="pvExpSection" style="margin-bottom: 20px;">
+                <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; color: #0284c7; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 8px;">Experience</h2>
+                <div id="pvExperienceList">
+                    <!-- Preview items -->
+                </div>
+            </div>
+
+            <div id="pvProjSection" style="margin-bottom: 20px;">
+                <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; color: #0284c7; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 8px;">Projects</h2>
+                <div id="pvProjectsList">
+                    <!-- Preview items -->
+                </div>
+            </div>
+
+            <div id="pvEduSection" style="margin-bottom: 20px;">
+                <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; color: #0284c7; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 8px;">Education</h2>
+                <div id="pvEducationList">
+                    <!-- Preview items -->
+                </div>
+            </div>
+
+            <div id="pvSkillsSection">
+                <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; color: #0284c7; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 8px;">Technical Skills & Certifications</h2>
+                <div style="color: #334155; line-height: 1.6;">
+                    <div id="pvSkillsLangs"><strong>Languages:</strong> Python, Java, C++, JavaScript, SQL</div>
+                    <div id="pvSkillsTools"><strong>Tools & Frameworks:</strong> Flask, React, Git, AWS, Docker</div>
+                    <div id="pvCertifications" style="margin-top: 4px;"><strong>Certifications:</strong> AWS Certified Cloud Practitioner</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px 14px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+    white-space: nowrap;
+}
+.tab-btn:hover, .tab-btn.active {
+    color: var(--primary-cyan);
+    background: rgba(0, 242, 254, 0.1);
+}
+</style>
+
+<!-- Load Resume Data JSON if editing -->
+<script>
+    const INITIAL_RESUME_DATA = {
+        personal_info: {{ resume.personal_info | safe if resume and resume.personal_info else '{}' }},
+        summary: {{ resume.summary | tojson if resume and resume.summary else '""' }},
+        education: {{ resume.education | safe if resume and resume.education else '[]' }},
+        experience: {{ resume.experience | safe if resume and resume.experience else '[]' }},
+        projects: {{ resume.projects | safe if resume and resume.projects else '[]' }},
+        skills: {{ resume.skills | safe if resume and resume.skills else '[]' }},
+        certifications: {{ resume.certifications | tojson if resume and resume.certifications else '""' }},
+        theme: {{ resume.theme | tojson if resume and resume.theme else '"modern"' }}
+    };
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/resume_builder.js') }}"></script>
+{% endblock %}
